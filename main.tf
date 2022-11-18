@@ -20,8 +20,12 @@ resource "aws_s3_bucket" "s3_bucket" {
   ]
 }  
 EOF
+ 
+  tags          = var.tags
+  force_destroy = true
 }
-  resource "aws_s3_bucket_website_configuration" "s3_bucket" {
+
+resource "aws_s3_bucket_website_configuration" "s3_bucket" {
   bucket = aws_s3_bucket.s3_bucket.id
 
   index_document {
@@ -32,9 +36,3 @@ EOF
     key = "error.html"
   }
 }
-  tags          = var.tags
-  force_destroy = true
-
-
-
-
