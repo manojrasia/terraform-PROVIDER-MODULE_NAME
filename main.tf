@@ -20,10 +20,17 @@ resource "aws_s3_bucket" "s3_bucket" {
   ]
 }  
 EOF
-  website {
-    index_document = "index.html"
-    error_document = "error.html"
+  resource "aws_s3_bucket_website_configuration" "s3_bucket" {
+  bucket = aws_s3_bucket.s3_bucket.id
+
+  index_document {
+    suffix = "index.html"
   }
+
+  error_document {
+    key = "error.html"
+  }
+}
   tags          = var.tags
   force_destroy = true
 }
