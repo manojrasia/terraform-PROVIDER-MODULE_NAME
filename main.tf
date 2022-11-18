@@ -1,28 +1,7 @@
-# Create S3 Bucket Resource
 resource "aws_s3_bucket" "s3_bucket" {
   bucket = var.bucket_name
-  acl    = "public-read"
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-      {
-          "Sid": "PublicReadGetObject",
-          "Effect": "Allow",
-          "Principal": "*",
-          "Action": [
-              "s3:GetObject"
-          ],
-          "Resource": [
-              "arn:aws:s3:::${var.bucket_name}/*"
-          ]
-      }
-  ]
-}  
-EOF
- 
-  tags          = var.tags
-  force_destroy = true
+
+  tags = var.tags
 }
 
 resource "aws_s3_bucket_website_configuration" "s3_bucket" {
@@ -35,4 +14,30 @@ resource "aws_s3_bucket_website_configuration" "s3_bucket" {
   error_document {
     key = "error.html"
   }
+}
+
+resource "aws_s3_bucket_acl" "s3_bucket" {
+  bucket = aws_s3_bucket.s3_bucket.id
+
+  acl = "public-read"
+}
+
+resource "aws_s3_bucket_policy" "s3_bucket" {
+  bucket = aws_s3_bucket.s3_bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "PublicReadGetObject"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:GetObject"
+        Resource = [
+          aws_s3_bucket.s3_bucket.arn,
+          "${aws_s3_bucket.s3_bucket.arn}/*",
+        ]
+      },
+    ]
+  })
 }
